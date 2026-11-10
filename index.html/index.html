@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVEMBER FIRST</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <section class="site-page" id="home">
+        <div class="page-content">
+            <main class="card">
+                <p>HELLO AH PICH</p>
+                <h1>A LITTLE<br>SURPRISE<br>FOR YOU</h1>
+            </main>
+            <a class="button" href="#note">Continue</a>
+        </div>
+    </section>
+
+    <section class="site-page" id="note" hidden>
+        <main class="note-content">
+            <h2>heres a little note<br>for you that i wanted<br>to say</h2>
+            <a class="note-continue" href="#letter">continue</a>
+        </main>
+    </section>
+
+    <section class="site-page" id="letter" hidden>
+        <div class="overlay-scene">
+            <main class="note-background">
+                <div class="letter-card">
+                    <p class="love-letter">
+                        You’ve been on my mind lately, and I’ve been wanting to tell you that you are the person I admire most.
+                        I’m so grateful that I’ve met you, because my life feels different in the best way since you came into it.
+                        Every time I see you smile, it feels like the world becomes brighter, and the sound of your laugh fills my heart with so much joy.
+                        Your touch feels like home, and I find myself thinking of you before I even realize it.
+                        You are the first person I think of when I wake up and the last person I think of when I fall asleep.
+                        Even on my lowest, just thinking of your smile can make everything feel lighter.
+                        I’m so thankful for you, and I hope you know how much you mean to me.
+                    </p>
+                    <a class="note-continue" href="#question">reveal<emoji>🫰🏻❤️</emoji></a>
+                </div>
+            </main>
+            <div class="overlay-backdrop" aria-hidden="true"></div>
+        </div>
+    </section>
+
+    <section class="site-page" id="question" hidden>
+        <div class="overlay-scene">
+            <main class="note-background">
+                <section class="letter-card final-card" aria-labelledby="final-question">
+                    <p class="final-intro">One last thing...</p>
+                    <h2 id="final-question">Would you like to try to know more about each other?</h2>
+                    <div class="final-actions">
+                        <button class="final-button" type="button" data-response="yes">Yes!</button>
+                        <button class="final-button final-button-secondary" type="button" data-response="no">No!</button>
+                    </div>
+                </section>
+            </main>
+        </div>
+        <div class="response-popup" role="dialog" aria-modal="true" aria-labelledby="response-note" aria-hidden="true">
+            <div class="response-popup-card">
+                <p id="response-note" class="response-note" aria-live="polite"></p>
+                <button class="final-button response-close" type="button">Close</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const pages = [...document.querySelectorAll(".site-page")];
+        const pageTitles = {
+            home: "NOVEMBER FIRST",
+            note: "NOVEMBER FIRST",
+            letter: "NOVEMBER FIRST",
+            question: "A question for you"
+        };
+
+        function showPage() {
+            const pageId = window.location.hash.slice(1) || "home";
+            const activePage = pages.find((page) => page.id === pageId) || pages[0];
+
+            pages.forEach((page) => {
+                page.hidden = page !== activePage;
+            });
+
+            document.body.className = activePage.id === "note"
+                ? "note-page"
+                : activePage.id === "letter" || activePage.id === "question"
+                    ? "overlay-page"
+                    : "";
+            document.title = pageTitles[activePage.id];
+        }
+
+        window.addEventListener("hashchange", showPage);
+        showPage();
+
+        const responsePopup = document.querySelector(".response-popup");
+        const responseNote = document.querySelector(".response-note");
+        const responseButtons = document.querySelectorAll("[data-response]");
+        const closeButton = document.querySelector(".response-close");
+
+        responseButtons.forEach((button) => {
+            button.addEventListener("click", async () => {
+                const answer = button.dataset.response;
+                responseButtons.forEach((responseButton) => {
+                    responseButton.disabled = true;
+                });
+
+                responseNote.textContent = answer === "yes"
+                    ? "Thank you for giving me hope."
+                    : "Thank you for your answer. You mean a lot to me.";
+                responsePopup.classList.add("is-visible");
+                responsePopup.setAttribute("aria-hidden", "false");
+                closeButton.focus();
+
+                try {
+                    const formData = new URLSearchParams({
+                        _subject: "She answered your question",
+                        answer: answer === "yes" ? "Yes" : "No"
+                    });
+                    const response = await fetch("https://formsubmit.co/ajax/Saltyyyhappy@gmail.com", {
+                        method: "POST",
+                        headers: {
+                            "Accept": "application/json"
+                        },
+                        body: formData
+                    });
+                    const result = await response.json();
+
+                    if (!response.ok || result.success !== "true") {
+                        throw new Error("The email service did not accept the response.");
+                    }
+                } catch (error) {
+                    responseButtons.forEach((responseButton) => {
+                        responseButton.disabled = false;
+                    });
+                    console.error("Could not send the answer notification:", error);
+                }
+            });
+        });
+
+        closeButton.addEventListener("click", () => {
+            responsePopup.classList.remove("is-visible");
+            responsePopup.setAttribute("aria-hidden", "true");
+        });
+    </script>
+</body>
+</html>
